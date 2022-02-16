@@ -1,0 +1,1 @@
+ansible-playbook -i ./iv idrac_os_deployment.yml
