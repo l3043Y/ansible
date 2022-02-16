@@ -10,12 +10,12 @@
   tasks: 
     - name: "Booting to Network Operating System image"
       idrac_os_deployment:
-        idrac_ip: "192.168.11.76"
-        idrac_user: "root"
-        idrac_password:  "3333"
-        validate_certs: False
-        share_name: "192.168.11.222:/mnt/mydrive/shared"
-        iso_image: "centos8-full.iso"        
+        idrac_ip: "{{ idrac_ip }}"
+        idrac_user: "{{ idrac_user }}"
+        idrac_password:  "{{ idrac_password }}"
+        validate_certs: "False"
+        share_name: "{{ share_name }}"
+        iso_image: "{{ iso_image }}"        
         expose_duration: 180
 
       tags:

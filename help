@@ -1,1 +1,8 @@
 ansible-playbook -i ./iv idrac_os_deployment.yml
+ansible-playbook -i ./iv idrac_os_deployment.yml --extra-vars "@args.json"
+
+        validate_certs: False
+        ca_path: "/path/to/ca_cert.pem"
+
+work!
+ansible-playbook -i iv idrac_os_deployment.yml --extra-vars "@args.json"
