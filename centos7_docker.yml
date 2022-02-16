@@ -4,7 +4,7 @@
   hosts: loadbalancer
   become: true
   vars:
-    docker_version: "20.10.12"
+    docker_version: "20.10.9"
 
   tasks:
     - name: Uninstall old versions
@@ -34,10 +34,20 @@
     - name: Install Docker
       package:
         name: 
-          - "docker-ce{{ docker_version + '*' | default(omit)}}"
+          # - "docker-ce{{ '-' + docker_version | default(omit)}}"
+          # - "docker-ce-cli{{ '-' + docker_version | default(omit)}}"
+          - docker-ce
           - docker-ce-cli
           - containerd.io
         state: latest
+        # allowerasing: yes
+      become: yes
+
+    - name: Add ansible_user to docker group
+      user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
       become: yes
 
     - name: Start Docker service
@@ -47,9 +57,21 @@
         enabled: yes
       become: yes
 
-    - name: Add user vagrant to docker group
-      user:
-        name: vagrant
-        groups: docker
-        append: yes
+    - name: Start Containerd service
+      service:
+        name: containerd
+        state: started
+        enabled: yes
       become: yes
+
+    - name: Create a directory for Docker Cli Plugin if it does not exist
+      file:
+        path: "/home/{{ansible_user}}/.docker/cli-plugins/"
+        state: directory
+        mode: '0755'
+
+    - name: Download Docker Compose V2
+      get_url:
+        url: https://github.com/docker/compose/releases/download/v2.2.3/docker-compose-linux-x86_64
+        dest: "/home/{{ansible_user}}/.docker/cli-plugins/docker-compose"
+        mode: '777'
