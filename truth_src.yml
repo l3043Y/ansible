@@ -1,0 +1,39 @@
+all:
+  hosts:
+    # 192.168.11.76: // ungrouped 
+  children:
+    idrac:
+      hosts:
+        pwed1:
+          idrac_ip: 192.168.11.76
+          idrac_user: root
+          idrac_password: '3333'
+      vars:
+        validate_certs: "False"
+        share_name: 192.168.11.222:/mnt/mydrive/shared
+        iso_image: centos8-full.iso
+        expose_duration: 180
+
+    loadbalancer:
+      hosts: 
+        master:
+          ansible_ssh_host: 192.168.11.75
+          ansible_ssh_user: vp
+          ansible_ssh_pass: '3333'
+          ansible_sudo_pass: '3333'
+
+    worker_nodes:
+      hosts:
+        worker1:
+          ansible_ssh_host: 192.168.11.80
+          ansible_ssh_user: vp
+          ansible_ssh_pass: '3333'
+        worker2:
+          ansible_ssh_host: 192.168.11.85
+          ansible_ssh_user: vp
+          ansible_ssh_pass: '3333'
+
+      vars:
+        name: worker
+
+  
