@@ -6,3 +6,4 @@ ansible-playbook -i ./iv idrac_os_deployment.yml --extra-vars "@args.json"
 
 work!
 ansible-playbook -i iv idrac_os_deployment.yml --extra-vars "@args.json"
+ansible-playbook -i truth_src.yml docker_centos8.yml -vv
