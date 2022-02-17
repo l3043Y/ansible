@@ -21,6 +21,8 @@ all:
           ansible_ssh_user: vp
           ansible_ssh_pass: '3333'
           ansible_sudo_pass: '3333'
+        vars:
+          device_service_tag: 'BNSC0W2'
 
     worker_nodes:
       hosts:

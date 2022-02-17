@@ -1,0 +1,14 @@
+--- 
+- hosts: idrac
+  connection: local
+  gather_facts: false
+  name: tm name
+
+  collections:
+    - dellemc.openmanage
+
+  tasks: # list
+    - name: sometask
+    
+      tags:
+        - idrac
