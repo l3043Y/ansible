@@ -5,7 +5,7 @@
   name: tm name
 
   collections:
-    - dellemc.openmanage
+    - ''
 
   tasks: # list
     - name: sometask

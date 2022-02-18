@@ -23,15 +23,19 @@ all:
           ansible_sudo_pass: '3333'
         vars:
           device_service_tag: 'BNSC0W2'
+          network_config:
+            name: external_network 
+            static_ip: 192.168.11.75/24
+            gateway_ip: 192.168.11.1
 
     worker_nodes:
       hosts:
         worker1:
-          ansible_ssh_host: 192.168.11.80
+          ansible_ssh_host: 192.168.1.80
           ansible_ssh_user: vp
           ansible_ssh_pass: '3333'
         worker2:
-          ansible_ssh_host: 192.168.11.85
+          ansible_ssh_host: 192.168.1.85
           ansible_ssh_user: vp
           ansible_ssh_pass: '3333'
 
