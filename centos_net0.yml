@@ -15,7 +15,7 @@
     #   eth3_mac: "e4:43:4b:12:e7:4c"
     #   eth4_mac: "e4:43:4b:12:e7:4d"
     
-    # network_provider: nm
+    network_provider: nm
     network_connections:
       - name: eno2  # profiles to keep/configure on the system
         type: ethernet
