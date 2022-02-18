@@ -1,0 +1,18 @@
+--- 
+- hosts: loadbalancer
+  connection: local
+  gather_facts: false
+  name: Setting Static Ip
+  vars:
+    target_mac: "e4:43:4b:12:e7:4a"
+    network_connection:
+      - name: static-network
+        type: ethernet
+        mac: “{{ target_mac }}”
+        state: up
+        ip :
+          dhcp: no
+          address:
+            - 192.168.0.5/24
+  roles:
+    - rhel-system-roles.network
