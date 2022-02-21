@@ -1,5 +1,5 @@
 --- 
-- hosts: idrac
+- hosts: loadbalancer
   connection: local
   gather_facts: false
   name: Power Up Dell PowerEdge
@@ -11,9 +11,9 @@
   tasks: # list
     - name: Manage power state of the first device
       dellemc.openmanage.redfish_powerstate:
-        baseuri: "{{ idrac_ip }}"
-        username: "{{ idrac_user }}"
-        password: "{{ idrac_password }}"
+        baseuri: "{{ r730xd_idrac8.ip }}"
+        username: "{{ r730xd_idrac8.username }}"
+        password: "{{ r730xd_idrac8.password }}"
         validate_certs: "False"
         reset_type: "On" # On ForceOff/On/Restart GracefullRestart/Shutdown PushPowerButton PowerCycle Nmi
       tags:

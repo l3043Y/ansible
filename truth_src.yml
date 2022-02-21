@@ -2,19 +2,6 @@ all:
   hosts:
     # 192.168.11.76: // ungrouped 
   children:
-    idrac:
-      hosts:
-        pwed1:
-          idrac_ip: 192.168.11.76
-          idrac_user: root
-          idrac_password: '3333'
-
-        vars:
-          validate_certs: "False"
-          share_name: 192.168.11.222:/mnt/mydrive/shared
-          iso_image: centos8-full.iso
-          expose_duration: 180
-
     loadbalancer:
       hosts: 
         master:
@@ -22,12 +9,40 @@ all:
           ansible_ssh_user: vp
           ansible_ssh_pass: '3333'
           ansible_sudo_pass: '3333'
-          vars:
-            device_service_tag: 'BNSC0W2'
-            network_config:
-              name: external_network 
-              static_ip: 192.168.11.75/24
-              gateway_ip: 192.168.11.1
+
+          device_service_tag: 'BNSC0W2'
+          nic:
+            eth1_mac: "e4:43:4b:12:e7:48" 
+            eth2_mac: "e4:43:4b:12:e7:4a"
+            eth3_mac: "e4:43:4b:12:e7:4c"
+            eth4_mac: "e4:43:4b:12:e7:4d"
+
+          pub_net:
+            name: eth1_external_network
+            mac: "{{nic.eth1_mac}}"
+            static_ip: 192.168.11.75/24
+            gateway_ip: 192.168.11.1
+            dns:
+              dns1: '1.1.1.1'
+              dns2: '8.8.8.8'
+
+          prv_net:
+            name: eth2_internal_network
+            mac: "{{nic.eth2_mac}}"
+            static_ip: 192.168.1.1/24
+            gateway_ip: 192.168.1.1
+            dns:
+              dns1: '1.1.1.1'
+              dns2: '8.8.8.8'
+      vars:
+        validate_certs: "False"
+        share_name: 192.168.11.222:/mnt/mydrive/shared
+        iso_image: centos8-full.iso
+        expose_duration: 180
+        r730xd_idrac8:
+          ip: 192.168.11.76
+          username: root
+          password: '3333'
 
     worker_nodes:
       hosts:
