@@ -1,14 +1,10 @@
 --- 
-- hosts: idrac
-  connection: local
-  gather_facts: false
-  name: tm name
+- hosts: all
+  # gather_facts: false
+  name: name
 
-  collections:
-    - ''
-
-  tasks: # list
-    - name: sometask
+  tasks: 
+    - name: task
     
       tags:
-        - idrac
+        - tag
