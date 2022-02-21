@@ -13,6 +13,6 @@
         ip :
           dhcp: no
           address:
-            - 192.168.0.5/24
+            - 192.168.1.5/24
   roles:
     - rhel-system-roles.network

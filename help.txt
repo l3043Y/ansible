@@ -11,3 +11,8 @@ ansible-playbook -i iv idrac_os_deployment.yml --extra-vars "@args.json"
 ansible-playbook -i truth_src.yml docker_centos8.yml -vv
 
 centos gateway
+
+ansible --version | grep "python version"
+sudo apt install python3 python3-pip ansible -y
+
+ansible -i truth_src.yml all -u ansible -m ping

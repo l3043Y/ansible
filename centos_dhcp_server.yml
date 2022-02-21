@@ -1,0 +1,14 @@
+--- 
+- hosts: master
+  gather_facts: true
+  become: yes
+  name: Set up and configure DHCP Server
+
+  tasks: # list
+    - name: Install the latest version of Apache and MariaDB
+      become: yes
+      ansible.builtin.package:
+        name:
+          - dhcp-server
+          - htop
+        state: present

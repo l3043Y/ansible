@@ -1,6 +1,5 @@
 --- 
 - hosts: loadbalancer
-  connection: local
   # remote_user: root
   # become: yes
   gather_facts: false

@@ -1,0 +1,36 @@
+--- 
+- hosts: loadbalancer
+  # gather_facts: false
+  name: Setting Static Ip
+  become: yes
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    # device_service_tag: 'BNSC0W2'
+    network_config:
+      name: external_network 
+      static_ip: 192.168.1.34/24
+      gateway_ip: 192.168.11.1
+      eth1_mac: "e4:43:4b:12:e7:48" 
+      eth2_mac: "e4:43:4b:12:e7:4a"
+      eth3_mac: "e4:43:4b:12:e7:4c"
+      eth4_mac: "e4:43:4b:12:e7:4d"
+    
+    network_provider: nm
+    network_connections:
+      - name: eth0
+        #persistent_state: present  # default
+        type: ethernet
+        autoconnect: yes
+        state: up
+        mac: "{{network_config.eth2_mac}}"
+        ip:
+          dhcp4: no
+          address: "{{network_config.static_ip}}"
+          gateway4: "{{network_config.gateway_ip}}" 
+          dns:
+            - 1.1.1.1
+            - 8.8.8.8
+  roles:
+    - linux-system-roles.network
+
+      
