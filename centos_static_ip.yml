@@ -1,40 +1,27 @@
 --- 
 - hosts: loadbalancer
-  # remote_user: root
-  # become: yes
-  gather_facts: false
-  name: Setting Static Ip
-  vars:
-    device_service_tag: 'BNSC0W2'
-    network_config:
-      name: external_network 
-      static_ip: 192.168.11.75/24
-      gateway_ip: 192.168.11.1
-
-  collections:
-    - community.general
+  become: yes
+  # gather_facts: false
+  name: Setting Static IP
 
   tasks: # list
-    - name: install needed network manager libs
-      yum: name={{ item }} state=present
-      with_items:
-        - NetworkManager-libnm
-        - nm-connection-editor
-        - libsemanage-python
-        - policycoreutils-python
-      become: yes
-      tags:
-        - os
+    - name: Install needed network manager libs
+      ansible.builtin.package:
+        name:
+          - NetworkManager-libnm
+          - nm-connection-editor
+          - python3-libsemanage
+          - python3-policycoreutils
+        state: present
 
-    # - name: Add an Ethernet connection with static IP configuration
-    #   community.general.nmcli:
-    #     conn_name: "internal" #"{{ network_config.name }}"
-    #     ifname: 10e40c90-434c-42b8-89b7-3bf1d1a1bf86
-    #     type: ethernet
-    #     ip4: 192.168.1.1/24 #"{{ network_config.static_ip }}"
-    #     gw4: 192.168.1.1 # "{{ network_config.gateway_ip }}"
-    #     state: present
-    #   register: out
-    #   tags:
-    #     - os
-    #     - network_config
+    - name: Try nmcli add Ethernet - conn_name only & ip4 gw4
+      community.general.nmcli:
+        state: present
+        type: ethernet
+        mac: e4:43:4b:12:e7:4a
+        conn_name: eth2_internal_network
+        # ifname: eth22
+        ip4: 192.168.1.1/24
+        gw4: 192.168.1.1
+      # with_items: "{{prv_net}}"
+      # register: echo
