@@ -10,6 +10,7 @@ all:
           ansible_ssh_pass: '3333'
           ansible_sudo_pass: '3333'
 
+          # Device hardware
           device_service_tag: 'BNSC0W2'
           nic:
             eth1_mac: "e4:43:4b:12:e7:48" 
@@ -17,23 +18,26 @@ all:
             eth3_mac: "e4:43:4b:12:e7:4c"
             eth4_mac: "e4:43:4b:12:e7:4d"
 
-          pub_net:
-            name: eth1_external_network
-            mac: "{{nic.eth1_mac}}"
-            static_ip: 192.168.11.75/24
-            gateway_ip: 192.168.11.1
-            dns:
-              dns1: '1.1.1.1'
-              dns2: '8.8.8.8'
+          #conf
+          conf_files_dir:
+            dhcp: ./centos_conf/dhcpd.conf
+          net_config: 
+            - name: eth1_external_network
+              mac: "{{nic.eth1_mac}}"
+              static_ip: 192.168.11.75/24
+              gateway_ip: 192.168.11.1
+              dns:
+                dns1: '1.1.1.1'
+                dns2: '8.8.8.8'
 
-          prv_net:
-            name: eth2_internal_network
-            mac: "{{nic.eth2_mac}}"
-            static_ip: 192.168.1.1/24
-            gateway_ip: 192.168.1.1
-            dns:
-              dns1: '1.1.1.1'
-              dns2: '8.8.8.8'
+            - name: eth2_internal_network
+              mac: "{{nic.eth2_mac}}"
+              static_ip: 192.168.1.1/24
+              gateway_ip: 192.168.1.1
+              dns:
+                dns1: '1.1.1.1'
+                dns2: '8.8.8.8'
+
       vars:
         validate_certs: "False"
         share_name: 192.168.11.222:/mnt/mydrive/shared

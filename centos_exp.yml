@@ -1,0 +1,9 @@
+--- 
+- hosts: loadbalancer
+  gather_facts: false
+  name: Experiment
+
+  tasks: 
+    - debug:
+        msg: "{{ item.name }}"
+      loop: "{{ net_config }}"
