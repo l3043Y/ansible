@@ -1,13 +1,99 @@
 all:
   hosts:
     # 192.168.11.76: // ungrouped 
+  vars:
+    baremetals:
+      - name: loadbalancer 
+        nic: 
+          - mac: "e4:43:4b:12:e7:48" 
+          - mac: "e4:43:4b:12:e7:4a"
+          - mac: "e4:43:4b:12:e7:4c"
+          - mac: "e4:43:4b:12:e7:4d"
+      - name: worker1
+        nic:
+          - mac: "90:B1:1C:7B:F5:E1"
+          - mac: "90:B1:1C:7B:F5:E4"
+      - name: worker2
+        nic:
+          - mac: "14:FE:B5:E5:8E:AE"
+
+    preferred_dns: "1.1.1.1" # cloudflare
+    int_net_subnet: "192.168.1"
+    ext_net_subnet: "192.168.11"
+    default_user: vp
+    default_pass: "3333"
+    lb: 0
+    w1: 1
+    w2: 2
+    networking:
+      lb: 
+        - eth_port: 0 # 0-3 
+          name: "enos{{eth_port+1}}_ext_net"
+          ip4: "{{ext_net_subnet}}.75"
+          mac: "{{baremetals[lb].nic[eth_port].mac}}"
+          router: "{{ext_net_subnet}}.1"
+          subnet: "{{ext_net_subnet}}.0"
+          netmask: "255.255.255.0" #/24
+          dns_name: "cloudflare google"
+          dns:
+            dns1: "{{preferred_dns}}"
+            dns2: "8.8.8.8"
+        - eth_port: 1 #0-3
+          name: "enos{{eth_port+1}}_int_net"
+          ip4: "{{int_net_subnet}}.1"
+          mac: "{{baremetals[0].nic[1].mac}}"
+          router: "{{int_net_subnet}}.1"
+          subnet: "{{int_net_subnet}}.0"
+          netmask: "255.255.255.0" #/24
+          dns_name: "dns.vpstart.com"
+          dns:
+            dns1: "{{int_net_subnet}}.1"
+            dns2: "{{preferred_dns}}"
+      w1:
+        - null
+        - eth_port: 0
+          name: "enos{{eth_port+1}}_int_net"
+          ip4: "{{int_net_subnet}}.80"
+          mac: "{{baremetals[1].nic[eth_port].mac}}"
+          router: "{{int_net_subnet}}.1"
+          subnet: "{{int_net_subnet}}.0"
+          netmask: "255.255.255.0" #/24
+          dns_name: "dns.vpstart.com"
+          dns:
+            dns1: "{{int_net_subnet}}.1"
+            dns2: "{{preferred_dns}}"
+      w2:
+        - null
+        - eth_port: 0
+          name: "enos{{eth_port+1}}_int_net"
+          ip4: "{{int_net_subnet}}.85"
+          mac: "{{baremetals[2].nic[eth_port].mac}}"
+          router: "{{int_net_subnet}}.1"
+          subnet: "{{int_net_subnet}}.0"
+          netmask: "255.255.255.0" #/24
+          dns_name: "dns.vpstart.com"
+          dns:
+            dns1: "{{int_net_subnet}}.1"
+            dns2: "{{preferred_dns}}"
+      ad:
+        - eth_port: 0
+          name: asible_admin_usb_eth
+          ip4: "{{int_net_subnet}}.111"
+          mac: "00:E0:4C:68:00:AE"
+          router: "{{int_net_subnet}}.1"
+          subnet: "{{int_net_subnet}}.0"
+          netmask: "255.255.255.0" #/24
+          dns_name: "dns.vpstart.com"
+          dns:
+            dns1: "{{int_net_subnet}}.1"
+            dns2: "{{preferred_dns}}"
   children:
     loadbalancer:
       hosts: 
         master:
           ansible_ssh_host: 192.168.11.75
           ansible_ssh_user: vp
-          ansible_ssh_pass: '3333'
+          ansible_ssh_pass: "3333"
           ansible_sudo_pass: '3333'
 
           # Device hardware
@@ -21,6 +107,7 @@ all:
           #conf
           conf_files_dir:
             dhcp: ./centos_conf/dhcpd.conf
+         
           net_config: 
             - name: eth1_external_network
               mac: "{{nic.eth1_mac}}"
@@ -48,6 +135,7 @@ all:
           username: root
           password: '3333'
 
+    
     worker_nodes:
       hosts:
         worker1:
@@ -59,7 +147,5 @@ all:
           ansible_ssh_user: vp
           ansible_ssh_pass: '3333'
 
-    vars:
-      name: worker
-
+    
   

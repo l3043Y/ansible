@@ -1,9 +1,9 @@
 --- 
-- hosts: loadbalancer
+- hosts: all
   gather_facts: false
   name: Experiment
-
+  
   tasks: 
     - debug:
-        msg: "{{ item.name }}"
-      loop: "{{ net_config }}"
+        msg: "{{ networking.lb[0] }}"
+      # loop: "{{ networking }}"
