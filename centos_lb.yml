@@ -1,0 +1,74 @@
+--- 
+- hosts: loadbalancer
+  # gather_facts: true
+  become: yes
+  name: Set up and configure DHCP Server
+
+  tasks: # list
+    - name: Use role in loop
+      # when: false
+      include_role:
+        name: linux-system-roles.network
+      vars:
+        # network_provider: nm
+        network_connections:
+          - name: "{{item.name}}"
+            type: ethernet
+            persistent_state: present
+            autoconnect: yes
+            state: up
+            mac: "{{item.mac}}"
+            ip:
+              dhcp4: no
+              address: "{{item.static_ip}}"
+              gateway4: "{{item.gateway_ip}}" 
+              dns:
+                - "{{item.dns.dns1}}"
+                - "{{item.dns.dns2}}"
+          # - persistent_state: absent  # remove other existing configure profile
+      loop: "{{net_config}}"
+
+    - name: Install the latest version of DHCP server
+      # when: false
+      become: yes
+      ansible.builtin.package:
+        name:
+          - dhcp-server
+        state: present
+
+    # - name: Copy a new "dhcpd.conf" file into place, backing up the original if it differs from the copied version
+    #   when: false
+    #   ansible.builtin.copy:
+    #     src: "{{conf_files_dir.dhcp}}"
+    #     dest: /etc/dhcp/dhcpd.conf
+    #     owner: root
+    #     group: root
+    #     mode: '0644'
+    #     backup: yes
+
+    - name: Apply Page Template
+      # when: false
+      template:
+        src: templates/dhcpd.conf.j2
+        dest: /etc/dhcp/dhcpd.conf
+        owner: root
+        group: root
+        mode: '0644'
+        backup: yes
+      vars: 
+        subnet: "{{networking[lb].int_network.subnet}}"
+        netmask: "{{networking[lb].int_network.netmask}}"
+        router: "{{networking[lb].int_network.router}}"
+        dns_name: "{{networking[lb].int_network.dns_name}}"
+        ext_dns: "{{preferred_dns}}"
+        time_in_sec_offset: 25200 # bankork
+        dhcp_ip_range: "{{int_net_subnet}}.70 {{int_net_subnet}}.79"
+        hosts: "{{ networking }}"
+
+    - name: Start DHCP Server service
+      # when: false
+      service:
+        name: dhcpd
+        state: started # restarted
+        enabled: yes
+      become: yes
