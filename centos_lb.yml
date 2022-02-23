@@ -56,14 +56,8 @@
         mode: '0644'
         backup: yes
       vars: 
-        subnet: "{{networking[lb].int_network.subnet}}"
-        netmask: "{{networking[lb].int_network.netmask}}"
-        router: "{{networking[lb].int_network.router}}"
-        dns_name: "{{networking[lb].int_network.dns_name}}"
-        ext_dns: "{{preferred_dns}}"
-        time_in_sec_offset: 25200 # bankork
-        dhcp_ip_range: "{{int_net_subnet}}.70 {{int_net_subnet}}.79"
-        hosts: "{{ networking }}"
+        args: "{{dhcpd_conf}}"
+          
 
     - name: Start DHCP Server service
       # when: false

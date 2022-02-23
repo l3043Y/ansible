@@ -1,16 +1,16 @@
-subnet {{subnet}} netmask {{netmask}} {
- option routers                  {{router}};
- option subnet-mask              {{netmask}};
- option domain-name              "{{dns_name}}";
- option domain-name-servers       {{ext_dns}};
- option time-offset              {{time_in_sec_offset}};    
- range {{dhcp_ip_range}};
+subnet {{args.subnet}} netmask {{args.netmask}} {
+ option routers                  {{args.router}};
+ option subnet-mask              {{args.netmask}};
+ option domain-name              "{{args.dns_name}}";
+ option domain-name-servers       {{args.ext_dns}};
+ option time-offset              {{args.time_offset}};    
+ range {{args.dhcp_ip_range}};
 }
 
-{% for item in hosts %}
+{% for item in args.harware_eths %}
 
 host {{item.name}} {
- hardware ethernet {{item.int_network.mac}}
- fixed-address {{item.int_network.ip4}}
+ hardware ethernet {{item.int.mac}}
+ fixed-address {{item.int.ip4}}
 }
 {% endfor %}

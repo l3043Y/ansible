@@ -2,8 +2,22 @@
 - hosts: all
   gather_facts: false
   name: Experiment
-  
+ 
   tasks: 
+    # - debug:
+    #     msg: "{{baremetals[idx].name}} {{ baremetals[idx].nic[net[idx].int.port] }}"
+    #   loop: "{{ net }}"
+    #   loop_control:
+    #     index_var: idx
+
+    # - debug:
+    #     msg: "{{baremetals | map('extract', hostvars, 'ec2_ip_address') | list)  }}"
+    #   loop: "{{baremetals |  combine  }}"
+    
+    # - debug:
+    #     msg: "{{ item.int.mac[-5:-3] + item.int.mac[-2:] }}"
+    #   loop: "{{ net  }}"
+
     - debug:
-        msg: "{{ networking.lb[0] }}"
-      # loop: "{{ networking }}"
+        msg: "{{ item.name }}"
+      loop: "{{net[1:]}}"

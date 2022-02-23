@@ -16,3 +16,5 @@ ansible --version | grep "python version"
 sudo apt install python3 python3-pip ansible -y
 
 ansible -i truth_src.yml all -u ansible -m ping
+
+networking
