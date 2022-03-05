@@ -2,10 +2,10 @@
 - hosts: loadbalancer
   # gather_facts: true
   become: yes
-  name: Set up and configure DHCP Server
+  name: Setup machine
 
   tasks: # list
-    - name: Use role in loop
+    - name: Setup network configuration
       # when: false
       include_role:
         name: linux-system-roles.network
@@ -36,16 +36,6 @@
           - dhcp-server
         state: present
 
-    # - name: Copy a new "dhcpd.conf" file into place, backing up the original if it differs from the copied version
-    #   when: false
-    #   ansible.builtin.copy:
-    #     src: "{{conf_files_dir.dhcp}}"
-    #     dest: /etc/dhcp/dhcpd.conf
-    #     owner: root
-    #     group: root
-    #     mode: '0644'
-    #     backup: yes
-
     - name: Apply Page Template
       # when: false
       template:
@@ -58,7 +48,6 @@
       vars: 
         args: "{{dhcpd_conf}}"
           
-
     - name: Start DHCP Server service
       # when: false
       service:

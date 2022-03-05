@@ -21,3 +21,13 @@
     - debug:
         msg: "{{ item.name }}"
       loop: "{{net[1:]}}"
+
+    # - name: Copy a new "dhcpd.conf" file into place, backing up the original if it differs from the copied version
+    #   when: false
+    #   ansible.builtin.copy:
+    #     src: "{{conf_files_dir.dhcp}}"
+    #     dest: /etc/dhcp/dhcpd.conf
+    #     owner: root
+    #     group: root
+    #     mode: '0644'
+    #     backup: yes

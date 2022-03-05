@@ -1,0 +1,14 @@
+--- 
+- hosts: all
+  # gather_facts: false
+  name: name
+
+  tasks: 
+    - name: task
+      ansible.posix.firewalld:
+      zone: trusted
+      interface: eth2
+      permanent: yes
+      state: enabled
+      tags:
+        - tag

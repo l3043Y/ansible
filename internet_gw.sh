@@ -12,6 +12,10 @@ cat /proc/sys/net/ipv4/ip_forward
 # incoming packets come to 22 port of External zone are forwarded to local 1234 port
 # firewall-cmd --zone=external --add-forward-port=port=22:proto=tcp:toport=1234
 # firewall-cmd --list-all --zone=external
+# firewall-cmd --add-forward-port=port=port-number:proto=tcp|udp:toport=port-number:toaddr=IP
+
+# firewall-cmd --add-forward-port=port=8022:proto=tcp:toport=22:toaddr=192.168.1.80
+# firewall-cmd --permanent --add-forward-port=port=8022:proto=tcp:toaddr=192.168.1.80:toport=22
 
 firewall-cmd --zone=internal --add-masquerade --permanent
 firewall-cmd --reload

@@ -99,14 +99,13 @@ all:
           username: root
           password: '3333'
 
-    
     worker_nodes:
       hosts:
         worker1:
-          ansible_ssh_host: "192.168.11.80"
-          ansible_ssh_user: "{{default_user}}"
-          ansible_ssh_pass: "{{default_pass}}"
-          # ansible_port: "8022"
+          ansible_host: "192.168.11.75"
+          ansible_user: "{{default_user}}"
+          ansible_pass: "{{default_pass}}"
+          ansible_port: "8022"
           ansible_sudo_pass: "{{default_pass}}"
 
           net_config:
@@ -134,3 +133,15 @@ all:
               dns:
                 dns1: "{{int_net_subnet}}.1"
                 dns2: "{{preferred_dns}}"
+
+    pcs:
+      hosts:
+        dell_optex:
+          ansible_ssh_host: "192.168.11.169"
+          ansible_ssh_user: "vps"
+          ansible_ssh_pass: "Vps@168."
+          # ansible_port: "8022"
+          ansible_sudo_pass: "Vps@168."
+
+    
+  
