@@ -1,0 +1,33 @@
+all:
+  hosts:
+    # 192.168.11.76: // ungrouped 
+  vars:
+    # some_vars: ''
+  children:
+    LAB:
+      hosts: 
+        poweredge81:
+          idrac_ip: 192.168.1.81
+          idrac_user: root
+          idrac_password: calvin
+          
+        poweredge83:
+          idrac_ip: 192.168.1.83
+          idrac_user: root
+          idrac_password: calvin
+
+        poweredge85:
+          idrac_ip: 192.168.1.85
+          idrac_user: root
+          idrac_password: calvin
+
+        poweredge87:
+          idrac_ip: 192.168.1.87
+          idrac_user: root
+          idrac_password: calvin
+
+        poweredge89:
+          idrac_ip: 192.168.1.89
+          idrac_user: root
+          idrac_password: '3333'
+

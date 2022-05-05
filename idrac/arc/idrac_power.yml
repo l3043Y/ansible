@@ -1,7 +1,7 @@
 --- 
 - hosts: loadbalancer
   connection: local
-  gather_facts: false
+  # gather_facts: false
   name: Power Up Dell PowerEdge
 
   collections:
@@ -15,6 +15,6 @@
         username: "{{ r730xd_idrac8.username }}"
         password: "{{ r730xd_idrac8.password }}"
         validate_certs: "False"
-        reset_type: "On" # On ForceOff/On/Restart GracefullRestart/Shutdown PushPowerButton PowerCycle Nmi
+        reset_type: "ForceOff" # On ForceOff/On/Restart GracefullRestart/Shutdown PushPowerButton PowerCycle Nmi
       tags:
         - idrac

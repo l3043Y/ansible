@@ -1,0 +1,29 @@
+--- 
+- hosts: poweredge83
+  connection: local
+  gather_facts: false
+  name: Get System Inventory
+
+  tasks: # list
+    - name: View all volume details
+      # when: false
+      dellemc.openmanage.dellemc_idrac_storage_volume:
+        idrac_ip:  "{{ idrac_ip }}"
+        idrac_user:  "{{ idrac_user }}"
+        idrac_password:  "{{ idrac_password }}"
+        state: "view"
+        validate_certs: "False"
+
+    - name: Convert physical disk to non-RAID
+      dellemc.openmanage.idrac_redfish_storage_controller:
+        baseuri: "{{ idrac_ip }}"
+        username: "{{ idrac_user }}"
+        password: "{{ idrac_password }}"
+        validate_certs: "False"
+        state: "present"
+        controller_id: "RAID.Integrated.1-1"
+        volume_type: "NonRedundant"
+        # volume_id:
+        #   - Disk.Bay.3:Enclosure.Internal.0-1:RAID.Integrated.1-1
+        target: Disk.Bay.3:Enclosure.Internal.0-1:RAID.Integrated.1-1
+          # - "Disk.Bay.4:Enclosure.Internal.0-1:RAID.Integrated.1-1"

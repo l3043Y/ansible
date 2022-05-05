@@ -1,0 +1,1 @@
+ansible-playbook -i truth_src.yml idrac/lab-pd-power.yml -vvv

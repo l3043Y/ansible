@@ -1,0 +1,30 @@
+--- 
+- hosts: poweredge83
+  # gather_facts: true
+  become: yes
+  name: Mount dev/sd{a,b}
+  vars:
+    devices: 
+      - {src: '/dev/sda', target: '/mnt/export1'}
+      - {src: '/dev/sdb', target: '/mnt/export2'}
+
+  tasks: # list
+
+    - name: Create a directory if it does not exist
+      ansible.builtin.file:
+        path: "{{ item.target }}"
+        state: directory
+        mode: '0755'
+      loop: "{{ devices }}"
+
+    - name: Mount up device sda sdb
+      ansible.posix.mount:
+        path: "{{ item.target }}"
+        src: "{{ item.src }}"
+        fstype: xfs
+        opts: defaults,noatime
+        dump: '0'
+        passno: '2'
+        state: present
+      loop: "{{ devices }}"
+        

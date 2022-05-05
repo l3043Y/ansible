@@ -1,0 +1,5 @@
+<poweredge85> EXEC /bin/sh -c '( umask 77 && mkdir -p "` echo /home/l3043y/.ansible/tmp `"&& mkdir "` echo /home/l3043y/.ansible/tmp/ansible-tmp-1650597069.0430794-19025-214005295052344 `" && echo ansible-tmp-1650597069.0430794-19025-214005295052344="` echo /home/l3043y/.ansible/tmp/ansible-tmp-1650597069.0430794-19025-214005295052344 `" ) && sleep 0'
+Using module file /home/l3043y/.ansible/collections/ansible_collections/dellemc/openmanage/plugins/modules/idrac_os_deployment.py
+<poweredge85> PUT /home/l3043y/.ansible/tmp/ansible-local-18980e7x2mdxv/tmpd91ajzil TO /home/l3043y/.ansible/tmp/ansible-tmp-1650597069.0430794-19025-214005295052344/AnsiballZ_idrac_os_deployment.py
+<poweredge85> EXEC /bin/sh -c 'chmod u+x /home/l3043y/.ansible/tmp/ansible-tmp-1650597069.0430794-19025-214005295052344/ /home/l3043y/.ansible/tmp/ansible-tmp-1650597069.0430794-19025-214005295052344/AnsiballZ_idrac_os_deployment.py && sleep 0'
+<poweredge85> EXEC /bin/sh -c '/usr/bin/python3 /home/l3043y/.ansible/tmp/ansible-tmp-1650597069.0430794-19025-214005295052344/AnsiballZ_idrac_os_deployment.py && sleep 0'

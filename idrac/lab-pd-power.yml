@@ -1,0 +1,43 @@
+--- 
+- hosts: minio #:!pfsense
+  connection: local
+  gather_facts: false
+  name: Power Up Dell PowerEdge
+
+  collections:
+    # - dellemc.openmanage
+    - dellemc.openmanage.redfish_powerstate
+
+  tasks: # list
+    - name: Get hardware inventory
+      when: False
+      dellemc_get_system_inventory:
+        idrac_ip:  "{{ idrac_ip }}"
+        idrac_user:  "{{ idrac_user }}"
+        idrac_password:  "{{ idrac_password }}"
+        validate_certs: "False"
+    
+    - name: Update firmware from repository on a HTTPS
+      when: False
+      dellemc.openmanage.idrac_firmware:
+          idrac_ip:  "{{ idrac_ip }}"
+          idrac_user:  "{{ idrac_user }}"
+          idrac_password:  "{{ idrac_password }}"
+          share_name: "https://downloads.dell.com"
+          reboot: True
+          # job_wait: True
+          apply_update: True
+          ignore_cert_warning: True
+          validate_certs: "False"
+
+          
+    - name: Manage power state of the first device
+      # when: False
+      dellemc.openmanage.redfish_powerstate:
+        baseuri: "{{ idrac_ip }}"
+        username: "{{ idrac_user }}"
+        password: "{{ idrac_password }}"
+        validate_certs: "False"
+        reset_type: "On" # ForceOff, ForceOn, ForceRestart, GracefulRestart, GracefulShutdown, Nmi, On, PowerCycle, PushPowerButton
+      tags:
+        - idrac

@@ -1,7 +1,7 @@
 ---
 - name: Install docker with YUM
   # gather_facts: false
-  hosts: worker1
+  hosts: minio
   become: true
   vars:
     docker_version: "20.10.9"

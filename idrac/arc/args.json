@@ -1,0 +1,7 @@
+{
+    "idrac_ip": "192.168.11.76",
+    "idrac_user": "root",
+    "idrac_password": "3333",
+    "share_name": "192.168.11.222:/mnt/mydrive/shared",
+    "iso_image": "centos8-full.iso" 
+}

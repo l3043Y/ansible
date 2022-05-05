@@ -1,9 +1,16 @@
 --- 
 - hosts: all
-  gather_facts: false
+  # gather_facts: false
   name: Experiment
  
   tasks: 
+    - name: Print all available facts
+      ansible.builtin.debug:
+        # var: ansible_facts
+        # var: ansible_interfaces
+        # var: ansible_default_ipv4
+        # var: "{{ ansible_interfaces | selectattr('type', 'equalto', ether) | sort(attribute='device') | list }}"
+        var: ansible_eno1
     # - debug:
     #     msg: "{{baremetals[idx].name}} {{ baremetals[idx].nic[net[idx].int.port] }}"
     #   loop: "{{ net }}"
@@ -18,9 +25,9 @@
     #     msg: "{{ item.int.mac[-5:-3] + item.int.mac[-2:] }}"
     #   loop: "{{ net  }}"
 
-    - debug:
-        msg: "{{ item.name }}"
-      loop: "{{net[1:]}}"
+    # - debug:
+    #     msg: "{{ item.name }}"
+    #   loop: "{{net[1:]}}"
 
     # - name: Copy a new "dhcpd.conf" file into place, backing up the original if it differs from the copied version
     #   when: false

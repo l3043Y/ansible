@@ -3,134 +3,81 @@ all:
     # 192.168.11.76: // ungrouped 
   vars:
     baremetals:
-      - name: loadbalancer 
-        nic: 
-          - mac: "E4:43:4B:12:E7:48" 
-          - mac: "E4:43:4B:12:E7:4A"
-          - mac: "E4:43:4B:12:E7:4C"
-          - mac: "E4:43:4B:12:E7:4D"
-      - name: worker1
-        nic:
-          - mac: "90:B1:1C:7B:F5:E1"
-          - mac: "90:B1:1C:7B:F5:E4"
-      - name: worker2
-        nic:
-          - mac: "14:FE:B5:E5:8E:AE"
-      - name: ansible_admin
-        nic:
-          - mac: "00:E0:4C:68:00:AE"
+      - name: poweredge83 
+        nic10: 
+          - mac: "a0:36:9f:b3:4a:e9" 
+      - name: poweredge85 
+        nic10: 
+          - mac: "00:1b:21:bc:50:18" 
+      - name: poweredge87
+        nic10: 
+          - mac: "00:1b:21:bc:50:14" 
+      - name: poweredge89
+        nic10: 
+          - mac: "e4:43:4b:12:e7:48" 
 
-    default_user: vp
-    default_pass: "3333"
-    lb: 0
-    w1: 1
-    w2: 2
-    ad: 3
+    centos_user: vps
+    centos_pass: '123'
+    centos_sudo: '123'
+    idrac_default_user: 'root'
+    idrac_default_pass: 'calvin'
+
     preferred_dns: "1.1.1.1" # cloudflare
-    int_net_subnet: "192.168.1"
-    ext_net_subnet: "192.168.11"
-    net:
-      - name: loadbalancer
-        ext: 
-          ip4: "{{ext_net_subnet}}.75"
-          mac: "{{baremetals[lb].nic[0].mac}}"
-        int:
-          ip4: "{{int_net_subnet}}.1"    
-          mac: "{{baremetals[lb].nic[1].mac}}"
-      - name: worker1
-        # ext: null
-        int: 
-          ip4: "{{int_net_subnet}}.80"
-          mac: "{{baremetals[w1].nic[0].mac}}"
-      - name: worker2
-        # ext: null
-        int:
-          ip4: "{{int_net_subnet}}.85"
-          mac: "{{baremetals[w2].nic[0].mac}}"
-      - name: ansible_tower
-        # ext: null
-        int:
-          ip4: "{{int_net_subnet}}.111"
-          mac: "{{baremetals[ad].nic[0].mac}}"
+    internal_subnet: "192.168.85"
+    external_subnet: "192.168.1"
 
   children:
-    loadbalancer:
+    pfsense:
       hosts: 
-        master:
-          ansible_ssh_host: "{{net[lb].ext.ip4}}"
-          ansible_ssh_user: "{{default_user}}"
-          ansible_ssh_pass: "{{default_pass}}"
-          ansible_sudo_pass: "{{default_pass}}"
+        poweredge81:
+          ansible_ssh_host: "192.168.1.82"
+          ansible_ssh_user: "{{centos_user}}"
+          ansible_ssh_pass: "{{centos_pass}}"
+          ansible_sudo_pass: "{{centos_sudo}}"
 
-          dhcpd_conf:
-            subnet: "{{int_net_subnet}}.0"
-            netmask: "255.255.255.0" # /24
-            router: "{{int_net_subnet}}.1"
-            dns_name: 'dns.vpstart.com'
-            ext_dns: "{{preferred_dns}}"
-            time_offset: 25200 # +25200 bangkok
-            dhcp_ip_range: "{{int_net_subnet}}.70 {{int_net_subnet}}.79"
-            harware_eths: "{{net[1:]}}"
+          idrac_ip: "192.168.1.81"
+          idrac_user: "{{idrac_default_user}}"
+          idrac_password: "{{idrac_default_pass}}"
 
-          net_config: 
-            - name: "ext_net_{{net[lb].ext.mac[-5:-3] + net[lb].ext.mac[-2:]}}"
-              mac: "{{net[lb].ext.mac}}"
-              static_ip: "{{net[lb].ext.ip4}}/24"
-              gateway_ip: "{{ext_net_subnet}}.1"
-              dns:
-                dns1: "{{preferred_dns}}"
-                dns2: '8.8.8.8'
+    minio:
+      hosts: 
+        poweredge83:
+          ansible_ssh_host: "{{internal_subnet}}.84"
+          ansible_ssh_user: "{{centos_user}}"
+          ansible_ssh_pass: "{{centos_pass}}"
+          ansible_sudo_pass: "{{centos_sudo}}"
 
-            - name: "int_net_{{net[lb].int.mac[-5:-3] + net[lb].int.mac[-2:]}}"
-              mac: "{{net[lb].int.mac}}"
-              static_ip: "{{net[lb].int.ip4}}/24"
-              gateway_ip: "{{int_net_subnet}}.1"
-              dns:
-                dns1: "{{int_net_subnet}}.1"
-                dns2: "{{preferred_dns}}"
+          idrac_ip: "{{internal_subnet}}.83"
+          idrac_user: "{{idrac_default_user}}"
+          idrac_password: "{{idrac_default_pass}}"
 
-      vars:
-        validate_certs: "False"
-        share_name: 192.168.11.222:/mnt/mydrive/shared
-        iso_image: centos8-full.iso
-        expose_duration: 180
-        r730xd_idrac8:
-          ip: 192.168.11.76
-          username: root
-          password: '3333'
+        poweredge85:
+          ansible_ssh_host: "{{internal_subnet}}.86"
+          ansible_ssh_user: "{{centos_user}}"
+          ansible_ssh_pass: "{{centos_pass}}"
+          ansible_sudo_pass: "{{centos_sudo}}"
 
-    
-    worker_nodes:
-      hosts:
-        worker1:
-          ansible_ssh_host: "192.168.11.80"
-          ansible_ssh_user: "{{default_user}}"
-          ansible_ssh_pass: "{{default_pass}}"
-          # ansible_port: "8022"
-          ansible_sudo_pass: "{{default_pass}}"
+          idrac_ip: "{{internal_subnet}}.85"
+          idrac_user: "{{idrac_default_user}}"
+          idrac_password: "{{idrac_default_pass}}"
 
-          net_config:
-            # - name: "null"
-            - name: "int_net_{{net[w1].int.mac[-5:-3] + net[w1].int.mac[-2:]}}"
-              mac: "{{net[w1].int.mac}}"
-              static_ip: "{{net[w1].int.ip4}}/24"
-              gateway_ip: "{{int_net_subnet}}.1"
-              dns:
-                dns1: "{{int_net_subnet}}.1"
-                dns2: "{{preferred_dns}}"
+        poweredge87:
+          ansible_ssh_host: "{{internal_subnet}}.88"
+          ansible_ssh_user: "{{centos_user}}"
+          ansible_ssh_pass: "{{centos_pass}}"
+          ansible_sudo_pass: "{{centos_sudo}}"
 
-        worker2:
-          ansible_ssh_host: "{{net[w2].int.ip4}}"
-          ansible_ssh_user: "{{default_user}}"
-          ansible_ssh_pass: "{{default_pass}}"
-          ansible_sudo_pass: "{{default_pass}}"
+          idrac_ip: "{{internal_subnet}}.87"
+          idrac_user: "{{idrac_default_user}}"
+          idrac_password: "{{idrac_default_pass}}"
 
-          net_config:
-            # - name: "null"
-            - name: "int_net_{{net[w2].int.mac[-5:-3] + net[w2].int.mac[-2:]}}"
-              mac: "{{net[w2].int.mac}}"
-              static_ip: "{{net[w2].int.ip4}}/24"
-              gateway_ip: "{{int_net_subnet}}.1"
-              dns:
-                dns1: "{{int_net_subnet}}.1"
-                dns2: "{{preferred_dns}}"
+        poweredge89:
+          ansible_ssh_host: "{{internal_subnet}}.90"
+          ansible_ssh_user: "{{centos_user}}"
+          ansible_ssh_pass: "{{centos_pass}}"
+          ansible_sudo_pass: "{{centos_sudo}}"
+
+          idrac_ip: "{{internal_subnet}}.89"
+          idrac_user: "{{idrac_default_user}}"
+          idrac_password: "{{idrac_default_pass}}"
+

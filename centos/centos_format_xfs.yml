@@ -1,0 +1,30 @@
+--- 
+- hosts: poweredge83
+  # gather_facts: true
+  become: yes
+  name: Setup machine
+
+  tasks: # list
+    - name: Pre-execution lsblk
+      ansible.builtin.command: lsblk -f
+      register: cmdout
+    - debug: var=cmdout.stdout_lines
+
+    - pause:
+        prompt: You are about to FORMAT dev/sda, dev/sdb! Press return to continue. Press Ctrl+c to abort
+
+    - name: Create a xfs filesystem on sda adb
+      community.general.filesystem:
+        fstype: xfs
+        dev: "{{ item }}"
+        opts: "-L DISK{{idx + 1}}"
+      loop: 
+        - /dev/sda
+        - /dev/sdb
+      loop_control:
+        index_var: idx
+    
+    - name: Post-execution lsblk
+      ansible.builtin.command: lsblk -f
+      register: cmdout
+    - debug: var=cmdout.stdout_lines

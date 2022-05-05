@@ -1,0 +1,98 @@
+--- 
+- hosts: loadbalancer
+  # gather_facts: false
+  name: name
+
+  tasks: 
+    - name: Internal zone
+      ansible.posix.firewalld:
+        zone: internal
+        interface: int_net_E74A
+        state: enabled
+        permanent: yes
+      become: yes
+
+    - name: External zone
+      ansible.posix.firewalld:
+        zone: external
+        interface: ext_net_E748
+        state: enabled
+        permanent: yes
+      become: yes
+
+    - name: Enable ipforward
+      ansible.posix.sysctl:
+        name: net.ipv4.ip_forward
+        value: '1'
+        sysctl_set: yes
+        state: present
+        reload: yes
+      become: yes
+
+    - name: Enable masquerate on external zone
+      ansible.posix.firewalld:
+        masquerade: yes
+        state: enabled
+        permanent: yes
+        zone: external
+      become: yes
+
+    - name: Enable masquerate on internal zone
+      ansible.posix.firewalld:
+        masquerade: yes
+        state: enabled
+        permanent: yes
+        zone: internal
+      become: yes
+
+    # - name: Forward rules
+    #   ansible.posix.firewalld:
+    #     rich_rule: rule family=ipv4 
+    #     # zone: public
+    #     permanent: yes
+    #     immediate: yes
+    #     state: enabled
+
+    - name: Masquerade postrouting
+      ansible.builtin.iptables:
+        ip_version: ipv4
+        table: nat
+        chain: POSTROUTING
+        # log_level: 0
+        out_interface : eno1
+        jump: MASQUERADE
+        protocol: tcp
+        match: tcp
+      become: yes
+
+    - name: Filter forward
+      ansible.builtin.iptables:
+        ip_version: ipv4
+        table: filter
+        chain: FORWARD
+        # log_level: 0
+        in_interface: eno2
+        out_interface: eno1
+        jump: ACCEPT
+        protocol: tcp
+        match: tcp
+      become: yes
+
+    - name: Filter forward ACCEPT CONNECTION
+      ansible.builtin.iptables:
+        ip_version: ipv4
+        table: filter
+        chain: FORWARD
+        # log_level: 0
+        in_interface: eno1
+        out_interface: eno2
+        ctstate: ESTABLISHED,RELATED
+        jump: ACCEPT
+        protocol: tcp
+        match: tcp
+      become: yes
+
+
+      # tags:
+      #   - network
+      #   - firewalld

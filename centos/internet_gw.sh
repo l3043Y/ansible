@@ -4,6 +4,8 @@ firewall-cmd --get-active-zone
 nmcli connection modify eno1 connection.zone external
 nmcli connection modify eno2 connection.zone internal
 
+sudo nmcli connection modify ext_net_E748 connection.zone external
+sudo nmcli connection modify int_net_E74A connection.zone internal
 firewall-cmd --zone=external --add-masquerade --permanent
 firewall-cmd --reload
 firewall-cmd --zone=external --query-masquerade
@@ -23,3 +25,20 @@ firewall-cmd --reload
 firewall-cmd --direct --add-rule ipv4 nat POSTROUTING 0 -o eno1 -j MASQUERADE
 firewall-cmd --direct --add-rule ipv4 filter FORWARD 0 -i eno2 -o eno1 -j ACCEPT
 firewall-cmd --direct --add-rule ipv4 filter FORWARD 0 -i eno1 -o eno2 -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+
+minio server http://host{1...4}/export{1...16} http://host{5...12}/export{1...16}
+
+n, err := s3Client.PutObject(
+    "my-bucketname", 
+    "my-objectname", 
+    object, 
+    objectStat.Size(),
+    minio.PutObjectOptions{
+        ContentType: "application/octet-stream", 
+        StorageClass: "REDUCED_REDUNDANCY"
+        }
+    )
+
+export MINIO_STORAGE_CLASS_STANDARD=EC:3
+export MINIO_STORAGE_CLASS_RRS=EC:2

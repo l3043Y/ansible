@@ -13,6 +13,7 @@
         # network_provider: nm
         network_connections:
           - name: "{{item.name}}"
+            # interface_name: same
             type: ethernet
             persistent_state: present
             autoconnect: yes

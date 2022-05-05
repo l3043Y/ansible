@@ -1,0 +1,61 @@
+--- 
+- hosts: poweredge85
+  connection: local
+  gather_facts: false
+  name: Booting to Network Operating System image
+
+  collections:
+    - dellemc.openmanage
+
+  tasks: 
+    - name: Poweroff
+      when: False
+      dellemc.openmanage.redfish_powerstate:
+        baseuri: "{{ idrac_ip }}"
+        username: "{{ idrac_user }}"
+        password: "{{ idrac_password }}"
+        validate_certs: "False"
+        reset_type: "ForceOff" # On ForceOff/On/Restart GracefullRestart/Shutdown PushPowerButton PowerCycle Nmi
+      tags:
+        - idrac
+
+    - name: Reset iDRAC
+      when: false
+      dellemc.openmanage.idrac_reset:
+        idrac_ip: "{{ idrac_ip }}"
+        idrac_user: "{{ idrac_user }}"
+        idrac_password:  "{{ idrac_password }}"
+        validate_certs: "False"
+        idrac_port: 443
+
+    - name: Show status of the Lifecycle Controller
+      dellemc.openmanage.idrac_lifecycle_controller_status_info:
+        idrac_ip: "{{ idrac_ip }}"
+        idrac_user: "{{ idrac_user }}"
+        idrac_password:  "{{ idrac_password }}"
+        validate_certs: "False"
+
+    - name: "Booting CentOS7"
+      # when: false
+      idrac_os_deployment:
+        idrac_ip: "{{ idrac_ip }}"
+        idrac_user: "{{ idrac_user }}"
+        idrac_password:  "{{ idrac_password }}"
+        validate_certs: "False"
+        share_name: "192.168.1.70:/home/vp/ISOs"
+        iso_image: "CentOS-7-x86_64-DVD-2009.iso"        
+        expose_duration: 180
+
+    # - name: "Booting to Network Operating System image"
+    #   when: false
+    #   idrac_os_deployment:
+    #     idrac_ip: "{{ idrac_ip }}"
+    #     idrac_user: "{{ idrac_user }}"
+    #     idrac_password:  "{{ idrac_password }}"
+    #     validate_certs: "False"
+    #     share_name: "{{ share_name }}"
+    #     iso_image: "{{ iso_image }}"        
+    #     expose_duration: 180
+
+    #   tags:
+    #     - network_iso
