@@ -1,12 +1,8 @@
 --- 
-- hosts: poweredge83
+- hosts: minio
   # gather_facts: true
   become: yes
   name: Mount dev/sd{a,b}
-  vars:
-    devices: 
-      - {src: '/dev/sda', target: '/mnt/export1'}
-      - {src: '/dev/sdb', target: '/mnt/export2'}
 
   tasks: # list
 
@@ -15,9 +11,10 @@
         path: "{{ item.target }}"
         state: directory
         mode: '0755'
-      loop: "{{ devices }}"
+      loop: "{{ disk_drives }}"
 
     - name: Mount up device sda sdb
+      when: false
       ansible.posix.mount:
         path: "{{ item.target }}"
         src: "{{ item.src }}"
@@ -25,6 +22,17 @@
         opts: defaults,noatime
         dump: '0'
         passno: '2'
-        state: present
+        state: absent
       loop: "{{ devices }}"
         
+    - name: Mount up device by UUID
+      # when: false
+      ansible.posix.mount:
+        path: "{{ item.target }}"
+        src: 'UUID={{item.uuid}}'
+        fstype: xfs
+        opts: defaults,noatime
+        dump: '0'
+        passno: '2'
+        state: mounted
+      loop: "{{ disk_drives }}"

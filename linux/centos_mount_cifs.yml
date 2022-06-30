@@ -1,0 +1,33 @@
+---
+- name: mount module demo
+  hosts: hrvpstart
+  # remote_user: root
+  # become: true
+  vars:
+    uri: "//192.168.88.20/Monthly Report"
+    mountpoint: "/home/admin/web/localhost.localdomain/laravel/storage/reports"
+
+  tasks:
+    - name: utility present
+      ansible.builtin.package:
+        name: cifs-utils
+        state: present
+
+    - name: check mountpoint exist
+      when: false
+      ansible.builtin.file:
+        path: "{{ mountpoint }}"
+        state: directory
+        mode: '0755'
+        owner: root
+        group: root
+
+    - name: Mount network share
+      ansible.posix.mount:
+        src: "{{ uri }}"
+        path: "{{ mountpoint }}"
+        fstype: cifs
+        opts: '_netdev,credentials=/home/admin/.credential,dir_mode=0755,file_mode=0755,uid=admin,gid=admin,forceuid,forcegid,x-systemd.automount'
+        state: mounted
+      become: yes
+      # remote_user: root

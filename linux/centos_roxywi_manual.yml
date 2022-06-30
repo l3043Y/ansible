@@ -1,0 +1,249 @@
+---
+- name: Install docker with YUM
+  # gather_facts: false
+  hosts: poweredge87
+  vars:
+    
+  tasks:
+    - name: install git
+      yum: 
+        name: 
+          - git
+        state: present
+      become: yes
+
+    - name: clone roxy-wi
+      ansible.builtin.git:
+        repo: https://github.com/hap-wi/roxy-wi.git
+        dest: /var/www/haproxy-wi
+        force: yes
+      become: yes
+
+    - name: add repo
+      yum:
+        name: 
+          - https://repo.ius.io/ius-release-el7.rpm
+          - epel-release
+        state: present
+      become: yes
+
+    - name: install softwares
+      yum:
+        name:
+          - git
+          - nmap-ncat
+          - net-tools
+          - dos2unix
+          - python3
+          - python3-pip
+          - python36-ldap3
+          - python36-pytz
+          - python36-requests
+          - python36-future
+          - python36-cryptography
+          - python36-jinja2
+          - python-configparser
+          - httpd
+          - mod_ssl
+          - rsync
+          - ansible
+          - nmap
+          - mod_wsgi
+        state: present
+      become: yes
+    
+    - name: install pip requriment
+      pip:
+        executable: pip3
+        requirements: /var/www/haproxy-wi/config_other/requirements_el7.txt
+      become: yes
+
+    - name: Copy a new roxy-wi.conf file into place, backing up the original if it differs from the copied version
+      ansible.builtin.copy:
+        remote_src: yes
+        src: /var/www/haproxy-wi/config_other/httpd/roxy-wi.conf
+        dest: /etc/httpd/conf.d/
+        owner: root
+        group: root
+        mode: '0644'
+        backup: yes
+      become: yes
+    
+    - name: Change file ownership, group and permissions
+      find:
+        paths: "/var/www/haproxy-wi/app"
+        file_type: file
+        recurse: yes
+        patterns: '*.py'
+      register: pyfiles
+    # - debug: msg="{{pyfiles}}"
+    - ansible.builtin.file:
+        path: "{{item.path}}"
+        mode: a+x
+      with_items: "{{pyfiles.files}}"
+      become: yes
+    
+    - name: Copy haproxy-wi
+      ansible.builtin.copy:
+        src: "{{item.src}}"
+        dest: "{{item.dest}}"
+        remote_src: yes
+        directory_mode: yes
+      become: yes
+      loop: 
+        - {src: '/var/www/haproxy-wi/config_other/logrotate/', dest: '/etc/logrotate.d/'}
+        # - {src: '/var/www/haproxy-wi/config_other/syslog/', dest: '/etc/rsyslog.d/'}
+    
+    - name: Disable SELinux
+      ansible.posix.selinux:
+        state: disabled
+      become: yes
+    
+    - name: Make sure httpd is running
+      ansible.builtin.systemd:
+        daemon_reload: yes
+        enabled: yes
+        name: httpd
+        state: restarted
+      become: yes
+
+    - name: restart rsyslog
+      ansible.builtin.systemd:
+        name: rsyslog
+        state: restarted
+      become: yes
+     
+    - name: Create directories for config
+      ansible.builtin.file:
+        path: "{{item}}"
+        state: directory
+        mode: '0755'
+      become: yes
+      loop:
+        - /var/www/haproxy-wi/app/certs
+        - /var/www/haproxy-wi/keys
+        - /var/www/haproxy-wi/configs/
+        - /var/www/haproxy-wi/configs/hap_config/
+        - /var/www/haproxy-wi/configs/kp_config/
+        - /var/www/haproxy-wi/configs/nginx_config/
+        - /var/www/haproxy-wi/configs/apache_config/
+        - /var/www/haproxy-wi/log/       
+
+    - name: change user and group permission to apache
+      ansible.builtin.file:
+        path: /var/www/haproxy-wi/
+        state: directory
+        recurse: yes
+        owner: apache
+        group: apache
+      become: yes
+
+    - name: Run create_db.py
+      command: 'cd /var/www/haproxy-wi/app/ && ./create_db.py'
+      become: yes
+      register: create_db_stdo
+    - debug: msg="{{create_db_stdo}}"
+
+    - name: change user and group permission to apache
+      ansible.builtin.file:
+        path: /var/www/haproxy-wi/
+        state: directory
+        recurse: yes
+        owner: apache
+        group: apache
+      become: yes
+
+    # - name: Disable SELinux
+    #   ansible.posix.selinux:
+    #     state: disabled
+    #   become: yes
+
+    # Install Ansible
+    - name: install sshpass
+      yum:
+        name: sshpass
+        state: present
+      become: yes
+
+    - name: create directories for ansible and ssh
+      ansible.builtin.file:
+        path: "{{item}}"
+        state: directory
+        mode: '0755'
+      become: yes
+      loop:
+        - /usr/share/httpd/.ansible
+        - /usr/share/httpd/.ssh
+    
+    - name: touch a file
+      ansible.builtin.file:
+        path: /usr/share/httpd/.ansible_galaxy
+        state: touch
+      become: yes
+
+    - name: Change file ownership, group and permissions for httpd
+      find:
+        paths: "/usr/share/httpd/"
+        patterns: '.*'
+        file_type: any
+        recurse: yes
+        hidden: yes
+      register: hidden_files
+    - debug: msg="{{hidden_files}}"
+
+    - name: change user and group permission to apache
+      ansible.builtin.file:
+        path: "{{item.path}}"
+        state: "{{'directory' if item.isdir else 'file'}}"
+        # recurse: yes
+        owner: apache
+        group: apache
+      become: yes
+      loop: "{{hidden_files.files}}"
+
+    - name: Validate the sudoers file before saving
+      ansible.builtin.lineinfile:
+        path: /etc/sudoers
+        state: present
+        regexp: "^{{item}} ALL="
+        line: '{{item}} ALL=(ALL) NOPASSWD: ALL'
+        validate: /usr/sbin/visudo -cf %s
+      become: yes
+      with_items:
+        - apache
+        - "{{ansible_ssh_user}}"
+
+    - name: Install fail2ban
+      yum:
+        name: 
+          - fail2ban
+        state: present
+      become: yes
+
+    - name: Copy fail2ban config
+      ansible.builtin.copy:
+        src: "{{item.src}}"
+        dest: "{{item.dest}}"
+        remote_src: yes
+        directory_mode: yes
+      become: yes
+      loop: 
+        - {src: '/var/www/haproxy-wi/config_other/fail2ban/filter.d/', dest: '/etc/fail2ban/filter.d/'}
+        - {src: '/var/www/haproxy-wi/config_other/fail2ban/jail.d/', dest: '/etc/fail2ban/jail.d/'}
+
+    - name: Start and enable fail2ban
+      ansible.builtin.systemd:
+        enabled: yes
+        name: fail2ban
+        state: started
+      become: yes
+
+    - name: FirewallD rules for http https
+      firewalld:
+        permanent: yes
+        immediate: yes
+        service: "http, https"
+        state: enabled
+      # with_items:
+      #  - http
+      #  - https

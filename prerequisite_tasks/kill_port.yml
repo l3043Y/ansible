@@ -1,0 +1,21 @@
+- ansible.builtin.debug:
+    msg: ">>>> checking port: {{item}} <<<<"
+
+- name: port info
+  shell: "lsof -i tcp:{{item}} || /bin/true"
+  register: lsof
+  become: true
+
+- ansible.builtin.debug:
+    var: lsof
+  when: lsof.stdout_lines | length > 0
+
+- pause:
+    prompt: "Do you want to kill the port {{item}} (yes/no)?"
+  register: confirmation
+  when: lsof.stdout_lines | length > 0
+
+- name: Sending killing command
+  shell: "kill -9 $(lsof -t -i tcp:{{item}})"
+  when: (lsof.stdout_lines | length > 0) and (confirmation.user_input | bool)
+  become: true

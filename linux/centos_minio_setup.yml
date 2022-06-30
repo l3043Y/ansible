@@ -1,0 +1,47 @@
+--- 
+- hosts: minio
+  gather_facts: true
+  name: Minio Setup Server
+  vars:
+    minio_dir: /opt/minio-server
+    ansible_python_interpreter: /usr/bin/python3
+
+  tasks:
+    - name: Create a directory if it does not exist
+      ansible.builtin.file:
+        path: "{{ minio_dir }}"
+        state: directory
+        mode: '0755'
+      become: yes
+
+    - name: Copy docker compose
+      ansible.builtin.copy:
+        src: minio_docker/docker-compose.yml
+        dest: "{{ minio_dir }}"
+        owner: root
+        group: root
+        mode: '0644'
+        backup: yes
+      become: yes
+
+    - name: install python-pip
+      package: 
+        name: python-docker-py.noarch
+        state: present
+      become: yes
+
+    - name: Install Docker Module for Python
+      pip:
+        name: 
+          - docker
+          - docker-compose
+      become: yes
+
+    - name: Run `docker-compose up` again
+      community.docker.docker_compose:
+        project_src: "{{ minio_dir }}"
+        build: no
+      register: output
+
+    - ansible.builtin.debug:
+        var: output

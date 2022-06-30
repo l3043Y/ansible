@@ -16,6 +16,27 @@ all:
         nic10: 
           - mac: "e4:43:4b:12:e7:48" 
 
+    wd_gold_18tb:
+      - label: 1-cede5d47
+        uuid: cede5d47-92d2-4b5d-b020-6a71a26234ff
+      - label: 2-50b8c3b4
+        uuid: 50b8c3b4-97b3-4237-ac3f-b970d65fdc75
+      - label: 3-434e1e34
+        uuid: 434e1e34-6ab6-4a79-ab26-5381f91ae233
+      - label: 4-e4cb1a8a
+        uuid: e4cb1a8a-5802-4f6c-8eb9-fd8a323cd0a0
+      - label: 5-fa60bf6b
+        uuid: fa60bf6b-e6f8-43b9-922c-0a0ce665fe67
+      - label: 6-f2347fc0
+        uuid: f2347fc0-1350-4bcd-ac88-f869daff767c
+      - label: 7-bd17ae85
+        uuid: bd17ae85-513e-47d1-b8ec-9f05a087b043
+      - label: 8-262915cc
+        uuid: 262915cc-8532-4f97-9292-eac5851a309a
+
+    disk0_mount_point: '/mnt/export1'
+    disk1_mount_point: '/mnt/export2'
+
     centos_user: vps
     centos_pass: '123'
     centos_sudo: '123'
@@ -30,6 +51,7 @@ all:
     pfsense:
       hosts: 
         poweredge81:
+          hostname: pfsense
           ansible_ssh_host: "192.168.1.82"
           ansible_ssh_user: "{{centos_user}}"
           ansible_ssh_pass: "{{centos_pass}}"
@@ -42,6 +64,8 @@ all:
     minio:
       hosts: 
         poweredge83:
+          hostname: minio-server-1
+
           ansible_ssh_host: "{{internal_subnet}}.84"
           ansible_ssh_user: "{{centos_user}}"
           ansible_ssh_pass: "{{centos_pass}}"
@@ -51,7 +75,15 @@ all:
           idrac_user: "{{idrac_default_user}}"
           idrac_password: "{{idrac_default_pass}}"
 
+          disk_drives:
+            - uuid: '{{wd_gold_18tb[0].uuid}}'
+              target: '{{disk0_mount_point}}'
+            - uuid: '{{wd_gold_18tb[1].uuid}}'
+              target: '{{disk1_mount_point}}'
+
         poweredge85:
+          hostname: minio-server-2
+
           ansible_ssh_host: "{{internal_subnet}}.86"
           ansible_ssh_user: "{{centos_user}}"
           ansible_ssh_pass: "{{centos_pass}}"
@@ -61,7 +93,15 @@ all:
           idrac_user: "{{idrac_default_user}}"
           idrac_password: "{{idrac_default_pass}}"
 
+          disk_drives:
+            - uuid: '{{wd_gold_18tb[2].uuid}}'
+              target: '{{disk0_mount_point}}'
+            - uuid: '{{wd_gold_18tb[3].uuid}}'
+              target: '{{disk1_mount_point}}'
+
         poweredge87:
+          hostname: minio-server-3
+
           ansible_ssh_host: "{{internal_subnet}}.88"
           ansible_ssh_user: "{{centos_user}}"
           ansible_ssh_pass: "{{centos_pass}}"
@@ -71,7 +111,15 @@ all:
           idrac_user: "{{idrac_default_user}}"
           idrac_password: "{{idrac_default_pass}}"
 
+          disk_drives:
+            - uuid: '{{wd_gold_18tb[4].uuid}}'
+              target: '{{disk0_mount_point}}'
+            - uuid: '{{wd_gold_18tb[5].uuid}}'
+              target: '{{disk1_mount_point}}'
+
         poweredge89:
+          hostname: minio-server-4
+
           ansible_ssh_host: "{{internal_subnet}}.90"
           ansible_ssh_user: "{{centos_user}}"
           ansible_ssh_pass: "{{centos_pass}}"
@@ -80,4 +128,10 @@ all:
           idrac_ip: "{{internal_subnet}}.89"
           idrac_user: "{{idrac_default_user}}"
           idrac_password: "{{idrac_default_pass}}"
+
+          disk_drives:
+            - uuid: '{{wd_gold_18tb[6].uuid}}'
+              target: '{{disk0_mount_point}}'
+            - uuid: '{{wd_gold_18tb[7].uuid}}'
+              target: '{{disk1_mount_point}}'
 

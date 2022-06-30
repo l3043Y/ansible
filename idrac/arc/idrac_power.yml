@@ -18,3 +18,24 @@
         reset_type: "ForceOff" # On ForceOff/On/Restart GracefullRestart/Shutdown PushPowerButton PowerCycle Nmi
       tags:
         - idrac
+
+    - name: Get hardware inventory
+      when: False
+      dellemc_get_system_inventory:
+        idrac_ip:  "{{ idrac_ip }}"
+        idrac_user:  "{{ idrac_user }}"
+        idrac_password:  "{{ idrac_password }}"
+        validate_certs: "False"
+    
+    - name: Update firmware from repository on a HTTPS
+      when: False
+      dellemc.openmanage.idrac_firmware:
+        idrac_ip:  "{{ idrac_ip }}"
+        idrac_user:  "{{ idrac_user }}"
+        idrac_password:  "{{ idrac_password }}"
+        share_name: "https://downloads.dell.com"
+        reboot: True
+        # job_wait: True
+        apply_update: True
+        ignore_cert_warning: True
+        validate_certs: "False"    

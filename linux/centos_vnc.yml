@@ -1,0 +1,11 @@
+---
+- hosts: testbench
+  name: enable VNC on CentOS
+
+  tasks:
+    - name: install VNC
+      package: 
+        name: 
+          - tigervnc-server
+        state: present
+      become: true

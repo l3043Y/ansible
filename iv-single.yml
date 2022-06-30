@@ -1,4 +1,5 @@
 all:
+  # childrens:
   hosts:
     hrvpstart:
       ansible_ssh_host: "192.168.88.27"
@@ -6,30 +7,36 @@ all:
       ansible_ssh_pass: "123++"
       ansible_sudo_pass: "123++"
 
-  # children:
-  #   LAB:
-  #     hosts: 
-  #       poweredge81:
-  #         idrac_ip: 192.168.1.81
-  #         idrac_user: root
-  #         idrac_password: calvin
+    testbench: 
+      ansible_ssh_host: "192.168.1.70"
+      ansible_ssh_user: "vp"
+      ansible_ssh_pass: "3333"
+      ansible_sudo_pass: "3333"
+
+  children:
+    LAB:
+      hosts: 
+        poweredge81:
+          idrac_ip: 192.168.1.81
+          idrac_user: root
+          idrac_password: calvin
           
-  #       poweredge83:
-  #         idrac_ip: 192.168.1.83
-  #         idrac_user: root
-  #         idrac_password: calvin
+        poweredge83:
+          idrac_ip: 192.168.1.83
+          idrac_user: root
+          idrac_password: calvin
 
-  #       poweredge85:
-  #         idrac_ip: 192.168.1.85
-  #         idrac_user: root
-  #         idrac_password: calvin
+        poweredge85:
+          idrac_ip: 192.168.1.85
+          idrac_user: root
+          idrac_password: calvin
 
-  #       poweredge87:
-  #         idrac_ip: 192.168.1.87
-  #         idrac_user: root
-  #         idrac_password: calvin
+        poweredge87:
+          idrac_ip: 192.168.1.87
+          idrac_user: root
+          idrac_password: calvin
 
-  #       poweredge89:
-  #         idrac_ip: 192.168.1.89
-  #         idrac_user: root
-  #         idrac_password: '3333'
+        poweredge89:
+          idrac_ip: 192.168.1.89
+          idrac_user: root
+          idrac_password: '3333'

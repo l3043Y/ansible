@@ -1,0 +1,70 @@
+---
+- name: Run a project with docker compose
+  hosts: pd85
+  vars:
+    proj_dir: /mnt/Data/Workspace/Projects/docker/haproxy
+    proj_name: haproxy
+    remote_proj_dir: "/home/{{ansible_ssh_user}}/projects"
+    tcp_ports:
+      - 80
+      - 443
+      - 1200
+    prerequisite_tasks:
+      - ../../prerequisite_tasks/haproxy_sysctl.yml
+
+  tasks:
+    - name: Docker compose prerequisite
+      include_tasks: ../docker-compose_requirments.yml
+
+    - name: Create proj directory on remote host
+      file:
+        path: "{{remote_proj_dir}}"
+        state: directory
+
+    - name: copy project to remote host
+      copy:
+        src: "{{proj_dir}}"
+        dest: "{{remote_proj_dir}}"
+
+    - name: run prerequisite
+      ansible.builtin.include_tasks: "{{item}}"
+      when: prerequisite_tasks | length > 0
+      with_items: "{{prerequisite_tasks}}"
+
+    - name: Tear down existing project
+      community.docker.docker_compose:
+        project_src: "{{remote_proj_dir}}/{{proj_name}}"
+        state: absent
+      register: output
+      vars:
+        ansible_python_interpreter: /usr/bin/python3
+
+    - ansible.builtin.debug:
+        var: output
+
+    - name: check port occupancy
+      include_tasks: ../../prerequisite_tasks/kill_port.yml
+      with_items: "{{tcp_ports}}"
+
+    - name: spin up the project
+      community.docker.docker_compose:
+        project_src: "{{remote_proj_dir}}/{{proj_name}}"
+        build: true
+      register: output
+      vars:
+        ansible_python_interpreter: /usr/bin/python3
+
+    - ansible.builtin.debug:
+        var: output
+
+    - name: open ports in firewall
+      when: tcp_ports | length > 0
+      ansible.posix.firewalld:
+        permanent: true
+        immediate: true
+        port: "{{item}}/tcp"
+        state: enabled
+      become: true
+      vars:
+        ansible_python_interpreter: /usr/bin/python
+      loop: "{{tcp_ports}}"

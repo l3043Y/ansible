@@ -1,0 +1,16 @@
+  - name: install ansible docker prerequisite
+    package:
+      name:
+        - python3
+        - python-docker-py.noarch
+      state: present
+    become: true
+  
+  - name: Install python docker
+    pip:
+      name:
+        - docker
+        - docker-compose
+    vars:
+      ansible_python_interpreter: /usr/bin/python3
+    become: true
